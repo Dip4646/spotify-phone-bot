@@ -21,7 +21,7 @@ def clean_filename(filename: str) -> str:
 
 def main():
     print("==========================================")
-    print("🚀 מתחיל סנכרון מלא מ-Spotify לימות המשיח")
+    print("🚀 Starting sync from Spotify to Yemot")
     print("==========================================")
 
     auth_manager = SpotifyClientCredentials(
@@ -48,7 +48,7 @@ def main():
         clean_title = clean_filename(f"{idx:03d}_{track_title}")
         local_filename = f"{clean_title}.mp3"
 
-        print(f"🔄 [{idx}/{len(items)}] מוריד את: {track_title} - {artists}")
+        print(f"🔄 [{idx}/{len(items)}] Downloading: {track_title} - {artists}")
 
         cmd = [
             "yt-dlp",
@@ -74,16 +74,16 @@ def main():
                     files = [('file', (local_filename, f, 'audio/mpeg'))]
                     res = requests.post(yemot_url, data=payload, files=files, timeout=60)
                 
-                print(f"  ✅ הועלה בהצלחה לימות המשיח: {local_filename}")
+                print(f"  ✅ Uploaded to Yemot: {local_filename}")
                 uploaded_count += 1
                 os.remove(local_filename)
             else:
-                print(f"  ❌ ההורדה נכשלה עבור: {track_title}")
+                print(f"  ❌ Download failed: {track_title}")
 
         except Exception as e:
-            print(f"  ❌ שגיאה בעיבוד {track_title}: {e}")
+            print(f"  ❌ Error processing {track_title}: {e}")
 
-    print(f"\n🏁 הסנכרון הסתיים! הועלו {uploaded_count} שירים לשלוחה 1.")
+    print(f"\n🏁 Finished! Uploaded {uploaded_count} tracks.")
 
 if __name__ == "__main__":
     main()
