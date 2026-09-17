@@ -10,7 +10,7 @@ YEMOT_SYSTEM_NUMBER = os.getenv("YEMOT_SYSTEM_NUMBER")
 YEMOT_PASSWORD = os.getenv("YEMOT_PASSWORD")
 
 # הלינק לפלייליסט של ספוטיפיי לבחירתך
-PLAYLIST_URL = "https://open.spotify.com/playlist/37i9dQZF1DXcBWAsP2311X"
+PLAYLIST_URL = "https://open.spotify.com/playlist/6fypePpbc1nkCaMCBCB9KP"
 
 def main():
     print("מתחיל סנכרון...")
