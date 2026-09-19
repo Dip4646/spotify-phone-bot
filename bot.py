@@ -4,43 +4,32 @@ import logging
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-# הגדרת הלוגים להצגת הודעות ברורות ב-GitHub Actions
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
-def get_env_variable(keys, default=""):
-    """שליפת משתנה סביבה מתוך רשימת שמות אפשריים"""
-    for key in keys:
-        val = os.environ.get(key)
-        if val and val.strip():
-            return val.strip()
-    return default
-
-# 1. שליפת הפרטים מתוך משתני הסביבה (או הזנה ישירה במידת הצורך)
-CLIENT_ID = get_env_variable(['SPOTIPY_CLIENT_ID', 'SPOTIFY_CLIENT_ID']) or "הכנס_כאן_את_ה-CLIENT_ID_אם_תרצה"
-CLIENT_SECRET = get_env_variable(['SPOTIPY_CLIENT_SECRET', 'SPOTIFY_CLIENT_SECRET']) or "הכנס_כאן_את_ה-CLIENT_SECRET_אם_תרצה"
+# קריאה ישירה למשתנים
+client_id = os.environ.get('SPOTIPY_CLIENT_ID') or os.environ.get('SPOTIFY_CLIENT_ID') or ""
+client_secret = os.environ.get('SPOTIPY_CLIENT_SECRET') or os.environ.get('SPOTIFY_CLIENT_SECRET') or ""
 
 def main():
-    logging.info("=== מתחיל סנכרון מול Spotify ===")
+    logging.info("=== בדיקת משתני סביבה ===")
+    logging.info(f"Client ID קיים? {bool(client_id)} (אורך: {len(client_id)})")
+    logging.info(f"Client Secret קיים? {bool(client_secret)} (אורך: {len(client_secret)})")
 
-    # בדיקה מקיפה אם המפתחות קיימים
-    if not CLIENT_ID or "הכנס_כאן" in CLIENT_ID:
-        logging.error("❌ חסר SPOTIPY_CLIENT_ID במערכת!")
-    if not CLIENT_SECRET or "הכנס_כאן" in CLIENT_SECRET:
-        logging.error("❌ חסר SPOTIPY_CLIENT_SECRET במערכת!")
+    if not client_id or not client_secret:
+        print("❌ שגיאה: המשתנים SPOTIPY_CLIENT_ID או SPOTIPY_CLIENT_SECRET ריקים ב-GitHub!")
+        sys.exit(1)
 
-    if not CLIENT_ID or not CLIENT_SECRET or "הכנס_כאן" in CLIENT_ID or "הכנס_כאן" in CLIENT_SECRET:
-        raise ValueError("Spotify Credentials are missing! Please check GitHub Secrets or bot.py")
-
-    # 2. התחברות לספוטיפיי עם המפתחות המפורשים
-    auth_manager = SpotifyClientCredentials(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET
-    )
-    sp = spotipy.Spotify(auth_manager=auth_manager)
-
-    # 3. שאילתת בדיקה לוודא שהאימות עובד
-    sp.search(q="test", limit=1)
-    logging.info("✅ התחברות לספוטיפיי עברה בהצלחה מלאה!")
+    try:
+        auth_manager = SpotifyClientCredentials(
+            client_id=client_id,
+            client_secret=client_secret
+        )
+        sp = spotipy.Spotify(auth_manager=auth_manager)
+        sp.search(q="test", limit=1)
+        logging.info("✅ התחברות לספוטיפיי עברה בהצלחה!")
+    except Exception as e:
+        logging.error(f"❌ שגיאת אימות מול Spotify: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
